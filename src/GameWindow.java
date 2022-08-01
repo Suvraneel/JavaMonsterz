@@ -11,6 +11,7 @@ public class GameWindow extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        setUndecorated(true);
         add(canvas);
         Timer t = new Timer(60, this);
         t.start();

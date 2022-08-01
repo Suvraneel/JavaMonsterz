@@ -7,12 +7,17 @@ import java.util.List;
 
 public class GameCanvas extends Canvas implements KeyListener {
     List<VisibleObjects> objects = new ArrayList<VisibleObjects>();
+    Background background;
     AudioManager audioManager = new AudioManager();
-    Player player = new Player(this, 100, 100);
+    Tiles tiles;
+    Player player;
 
     public GameCanvas() {
-        objects.add(new Background(this));
+        background = new Background(this);
+        objects.add(background);
+        Tiles tiles = new Tiles(this);
         objects.add(new Tiles(this));
+        player = new Player(this, 0, 0, tiles);
         objects.add(player);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
@@ -64,7 +69,7 @@ public class GameCanvas extends Canvas implements KeyListener {
                 player.setDirection(Player.Direction.UP);
             }
         }
-        System.out.println("Key pressed: " + e.getKeyCode());
+//        System.out.println("Key pressed: " + e.getKeyCode());
         player.move(player.getDirection());
         player.tick();
         draw();
@@ -74,4 +79,15 @@ public class GameCanvas extends Canvas implements KeyListener {
     public void keyReleased(KeyEvent e) {
 
     }
+
+//    public boolean canMove(int x, int y) {
+//        for (VisibleObjects object : objects) {
+//            if (object.getClass().getSimpleName().equals("Tiles")) {
+//                if (object.getX() == x && object.getY() == y) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
 }
