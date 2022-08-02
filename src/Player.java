@@ -3,32 +3,32 @@ import java.awt.*;
 import java.util.Objects;
 
 public class Player implements VisibleObjects {
-    private final int speed;
     private final Tiles tiles;
+    private final int speed;
     GameCanvas canvas;
     Image image;
     Sprite runningSprite = new Sprite("player/running", 6);
     Sprite jumpingSprite = new Sprite("player/jumping", 8);
     Sprite idleSprite = new Sprite("player/idle", 3);
     Sprite dyingSprite = new Sprite("player/dying", 6);
-    Dimension size
-            = Toolkit.getDefaultToolkit().getScreenSize();
+    Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
     int screenHeight = (int) size.getHeight();
     int screenWidth = (int) size.getWidth();
-    Rectangle bounds = new Rectangle();
+    Rectangle playerBounds = new Rectangle();
     private State state = State.IDLE;
     private Direction direction = Direction.RIGHT;
     private int x;
     private int y;
 
-    public Player(GameCanvas canvas, int x, int y, Tiles tiles) {
+    public Player(GameCanvas canvas, int x, int y, int speed, Tiles tiles) {
         this.canvas = canvas;
         this.x = x;
         this.y = y;
+        this.speed = speed;
         this.tiles = tiles;
         speed = 5;
         image = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/player/idle/00.png"))).getImage();
-        bounds.setBounds(x, y, image.getWidth(null), image.getHeight(null));
+        playerBounds.setBounds(x, y, image.getWidth(null), image.getHeight(null));
         for (int[] tr : tiles.tiles) {
             for (int t : tr)
                 System.out.print(t);
@@ -39,7 +39,11 @@ public class Player implements VisibleObjects {
 
     @Override
     public void drawObject(Graphics2D g) {
-        g.drawImage(image, x, y, canvas);
+        if (direction == Direction.RIGHT) {
+            g.drawImage(image, x, y, canvas);
+        } else {
+            g.drawImage(image, x + image.getWidth(null), y, -image.getWidth(null), image.getHeight(null), canvas);
+        }
     }
 
     public void move(Direction direction) {
@@ -61,11 +65,11 @@ public class Player implements VisibleObjects {
                     x += speed;
                 break;
         }
-        bounds.setLocation(x, y);
+        playerBounds.setLocation(x, y);
     }
 
     private boolean canMove(int x, int y) {
-        Rectangle rect = new Rectangle(bounds);
+        Rectangle rect = new Rectangle(playerBounds);
         rect.setLocation(x, y);
         int i = (y * tiles.tiles.length) / screenHeight;
         int j = (x * tiles.tiles[0].length) / screenWidth;
@@ -110,7 +114,11 @@ public class Player implements VisibleObjects {
     }
 
     public void tick() {
-        // Todo: implement
+        // Todo: implement Gravity
+        while (canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
+            y += speed;
+            canvas.draw();
+        }
     }
 
     enum Direction {

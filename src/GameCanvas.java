@@ -5,23 +5,28 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameCanvas extends Canvas implements KeyListener {
+public class GameCanvas extends Canvas implements KeyListener, Runnable {
     List<VisibleObjects> objects = new ArrayList<VisibleObjects>();
     Background background;
     AudioManager audioManager = new AudioManager();
     Tiles tiles;
     Player player;
+    Enemy enemy;
 
     public GameCanvas() {
         background = new Background(this);
         objects.add(background);
         Tiles tiles = new Tiles(this);
         objects.add(new Tiles(this));
-        player = new Player(this, 0, 0, tiles);
+        player = new Player(this, 0, 0, 5, tiles);
         objects.add(player);
+        enemy = new Enemy(this, 100, 0, tiles, new Point(0, 0), new Point(200, 0));
+        objects.add(enemy);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
         audioManager.play("src/resources/sounds/diablo.wav", true);
+//        Thread thread = new Thread(this);
+//        thread.start();
     }
 
     public void draw() {
@@ -80,14 +85,17 @@ public class GameCanvas extends Canvas implements KeyListener {
 
     }
 
-//    public boolean canMove(int x, int y) {
-//        for (VisibleObjects object : objects) {
-//            if (object.getClass().getSimpleName().equals("Tiles")) {
-//                if (object.getX() == x && object.getY() == y) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
+    @Override
+    public void run() {
+        while (true) {
+            enemy.move();
+            draw();
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+    }
 }
