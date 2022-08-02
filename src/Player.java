@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Player implements VisibleObjects {
     private final Tiles tiles;
     private final int speed;
+    public boolean isSpacePressed = false;
     GameCanvas canvas;
     Image image;
     Sprite runningSprite = new Sprite("player/running", 6);
@@ -95,7 +96,19 @@ public class Player implements VisibleObjects {
     public void setState(State state) {
         this.state = state;
         if (state == State.DYING) {
-            image = dyingSprite.getNextFrame();
+            try {
+                while (true) {
+                    image = dyingSprite.getNextFrame();
+                    Thread.sleep(10);
+                    if (dyingSprite.spriteIndex == dyingSprite.frames.length - 1) {
+                        canvas.gameOver();
+                        break;
+                    }
+                }
+                canvas.gameOver();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         } else if (state == State.JUMPING) {
             image = jumpingSprite.getNextFrame();
         } else if (state == State.RUNNING) {
@@ -115,7 +128,7 @@ public class Player implements VisibleObjects {
 
     public void tick() {
         // Todo: implement Gravity
-        while (canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
+        while (state != State.JUMPING && canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
             y += speed;
             canvas.draw();
         }

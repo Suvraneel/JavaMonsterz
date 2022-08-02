@@ -20,19 +20,19 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         objects.add(new Tiles(this));
         player = new Player(this, 0, 0, 5, tiles);
         objects.add(player);
-        enemy = new Enemy(this, 100, 0, tiles, new Point(0, 0), new Point(200, 0));
+        enemy = new Enemy(this, 100, 200, tiles, new Point(0, 200), new Point(1000, 200), 10);
         objects.add(enemy);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
         audioManager.play("src/resources/sounds/diablo.wav", true);
-//        Thread thread = new Thread(this);
-//        thread.start();
+        Thread thread = new Thread(this);
+        thread.start();
     }
 
     public void draw() {
         BufferStrategy bs = getBufferStrategy();
         if (bs == null) {
-            createBufferStrategy(2);
+            createBufferStrategy(3);
             return;
         }
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
@@ -51,6 +51,10 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (player.getState() == Player.State.DYING)        // Freeze movements when player is dead ie, game over
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+                System.exit(0);
+            else return;
         switch (e.getKeyCode()) {
             case KeyEvent.VK_ESCAPE -> System.exit(0);
             case KeyEvent.VK_A -> {
@@ -71,31 +75,55 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
             }
             case KeyEvent.VK_SPACE -> {
                 player.setState(Player.State.JUMPING);
-                player.setDirection(Player.Direction.UP);
+                player.isSpacePressed = true;
             }
         }
 //        System.out.println("Key pressed: " + e.getKeyCode());
         player.move(player.getDirection());
-        player.tick();
-        draw();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        if (player.getState() == Player.State.DYING) return;
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_A -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.LEFT);
+            }
+            case KeyEvent.VK_D -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.RIGHT);
+            }
+            case KeyEvent.VK_W -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.UP);
+            }
+            case KeyEvent.VK_S -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.DOWN);
+            }
+            case KeyEvent.VK_SPACE -> {
+                player.setState(Player.State.IDLE);
+            }
+        }
     }
 
     @Override
     public void run() {
-        while (true) {
-            enemy.move();
-            draw();
+        while (player.getState() != Player.State.DYING) {
             try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
+                Thread.sleep(16);
+                player.tick();
+                enemy.move();
+                draw();
+            } catch (Exception e) {
                 e.printStackTrace();
-                break;
             }
         }
+    }
+
+    public void gameOver() {
+//        audioManager.play("src/resources/sounds/gameover.wav", false);
+        objects.add(new GameOver(this));
     }
 }
