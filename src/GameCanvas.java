@@ -5,29 +5,34 @@ import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameCanvas extends Canvas implements KeyListener {
+public class GameCanvas extends Canvas implements KeyListener, Runnable {
     List<VisibleObjects> objects = new ArrayList<VisibleObjects>();
     Background background;
     AudioManager audioManager = new AudioManager();
     Tiles tiles;
     Player player;
+    Enemy enemy;
 
     public GameCanvas() {
         background = new Background(this);
         objects.add(background);
         Tiles tiles = new Tiles(this);
         objects.add(new Tiles(this));
-        player = new Player(this, 0, 0, tiles);
+        player = new Player(this, 0, 0, 5, tiles);
         objects.add(player);
+        enemy = new Enemy(this, 100, 200, tiles, new Point(0, 200), new Point(1000, 200), 10);
+        objects.add(enemy);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
         audioManager.play("src/resources/sounds/diablo.wav", true);
+        Thread thread = new Thread(this);
+        thread.start();
     }
 
     public void draw() {
         BufferStrategy bs = getBufferStrategy();
         if (bs == null) {
-            createBufferStrategy(2);
+            createBufferStrategy(3);
             return;
         }
         Graphics2D g = (Graphics2D) bs.getDrawGraphics();
@@ -46,6 +51,10 @@ public class GameCanvas extends Canvas implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (player.getState() == Player.State.DYING)        // Freeze movements when player is dead ie, game over
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+                System.exit(0);
+            else return;
         switch (e.getKeyCode()) {
             case KeyEvent.VK_ESCAPE -> System.exit(0);
             case KeyEvent.VK_A -> {
@@ -66,28 +75,55 @@ public class GameCanvas extends Canvas implements KeyListener {
             }
             case KeyEvent.VK_SPACE -> {
                 player.setState(Player.State.JUMPING);
-                player.setDirection(Player.Direction.UP);
+                player.isSpacePressed = true;
             }
         }
 //        System.out.println("Key pressed: " + e.getKeyCode());
         player.move(player.getDirection());
-        player.tick();
-        draw();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        if (player.getState() == Player.State.DYING) return;
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_A -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.LEFT);
+            }
+            case KeyEvent.VK_D -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.RIGHT);
+            }
+            case KeyEvent.VK_W -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.UP);
+            }
+            case KeyEvent.VK_S -> {
+                player.setState(Player.State.IDLE);
+                player.setDirection(Player.Direction.DOWN);
+            }
+            case KeyEvent.VK_SPACE -> {
+                player.setState(Player.State.IDLE);
+            }
+        }
     }
 
-//    public boolean canMove(int x, int y) {
-//        for (VisibleObjects object : objects) {
-//            if (object.getClass().getSimpleName().equals("Tiles")) {
-//                if (object.getX() == x && object.getY() == y) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
+    @Override
+    public void run() {
+        while (player.getState() != Player.State.DYING) {
+            try {
+                Thread.sleep(16);
+                player.tick();
+                enemy.move();
+                draw();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void gameOver() {
+//        audioManager.play("src/resources/sounds/gameover.wav", false);
+        objects.add(new GameOver(this));
+    }
 }
