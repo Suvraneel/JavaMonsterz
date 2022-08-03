@@ -5,11 +5,12 @@ import java.util.Objects;
 public class Player implements VisibleObjects {
     private final Tiles tiles;
     private final int speed;
+    private final int jumpStrength;
     public boolean isSpacePressed = false;
     GameCanvas canvas;
     Image image;
     Sprite runningSprite = new Sprite("player/running", 6);
-    Sprite jumpingSprite = new Sprite("player/jumping", 8);
+    Sprite jumpingSprite = new Sprite("player/jumping", 2);
     Sprite idleSprite = new Sprite("player/idle", 3);
     Sprite dyingSprite = new Sprite("player/dying", 6);
     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
@@ -17,16 +18,17 @@ public class Player implements VisibleObjects {
     int screenWidth = (int) size.getWidth();
     Rectangle playerBounds = new Rectangle();
     private State state = State.IDLE;
-    private Direction direction = Direction.RIGHT;
+    private Direction direction = Direction.NONE;
     private int x;
     private int y;
 
-    public Player(GameCanvas canvas, int x, int y, int speed, Tiles tiles) {
+    public Player(GameCanvas canvas, int x, int y, int speed, Tiles tiles, int jumpStrength) {
         this.canvas = canvas;
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.tiles = tiles;
+        this.jumpStrength = jumpStrength;
         speed = 5;
         image = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/player/idle/00.png"))).getImage();
         playerBounds.setBounds(x, y, image.getWidth(null), image.getHeight(null));
@@ -40,7 +42,7 @@ public class Player implements VisibleObjects {
 
     @Override
     public void drawObject(Graphics2D g) {
-        if (direction == Direction.RIGHT) {
+        if (direction != Direction.LEFT) {
             g.drawImage(image, x, y, canvas);
         } else {
             g.drawImage(image, x + image.getWidth(null), y, -image.getWidth(null), image.getHeight(null), canvas);
@@ -58,13 +60,18 @@ public class Player implements VisibleObjects {
                     y += speed;
                 break;
             case LEFT:
-                if (canMove(x - speed, y + image.getHeight(canvas)))   // x+x_offset-speed, y
+                if (canMove(x - speed, y + image.getHeight(canvas))) {  // x+x_offset-speed, y
                     x -= speed;
+                }
                 break;
             case RIGHT:
-                if (canMove(x + image.getWidth(canvas) + speed, y + image.getHeight(canvas)))   // x+imgWd+speed, y+imgHt
+                if (canMove(x + image.getWidth(canvas) + speed, y + image.getHeight(canvas))) {   // x+imgWd+speed, y+imgHt
                     x += speed;
+                }
                 break;
+        }
+        if (isSpacePressed && canMove(x, y - jumpStrength)) {
+            y -= jumpStrength;
         }
         playerBounds.setLocation(x, y);
     }
@@ -78,7 +85,7 @@ public class Player implements VisibleObjects {
         int y_offset = (screenHeight / tiles.tiles.length);
         Rectangle blk = null;
         System.out.println("i: " + i + " j: " + j + " x:" + rect.getX() + " y:" + rect.getY() + " xmax:" + rect.getMaxX() + " ymax:" + rect.getMaxY());
-        if (i <= 0 || i >= tiles.tiles.length || j <= 0 || j >= tiles.tiles[0].length) {
+        if (x < 0 || i >= tiles.tiles.length || y < 0 || j >= tiles.tiles[0].length) {
             return false;
         }
         if (tiles.tiles[i][j] == 1) {
@@ -109,7 +116,7 @@ public class Player implements VisibleObjects {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else if (state == State.JUMPING) {
+        } else if (state == State.JUMPING || isSpacePressed) {
             image = jumpingSprite.getNextFrame();
         } else if (state == State.RUNNING) {
             image = runningSprite.getNextFrame();
@@ -128,14 +135,14 @@ public class Player implements VisibleObjects {
 
     public void tick() {
         // Todo: implement Gravity
-        while (state != State.JUMPING && canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
+        while (!isSpacePressed && canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
             y += speed;
             canvas.draw();
         }
     }
 
     enum Direction {
-        UP, DOWN, LEFT, RIGHT
+        UP, DOWN, LEFT, RIGHT, NONE
     }
 
     enum State {

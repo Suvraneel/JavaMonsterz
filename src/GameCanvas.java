@@ -11,21 +11,23 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     AudioManager audioManager = new AudioManager();
     Tiles tiles;
     Player player;
-    Enemy enemy;
+    ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+    Thread thread;
 
     public GameCanvas() {
         background = new Background(this);
         objects.add(background);
         Tiles tiles = new Tiles(this);
         objects.add(new Tiles(this));
-        player = new Player(this, 0, 0, 5, tiles);
+        player = new Player(this, 0, 0, 5, tiles, 8);
         objects.add(player);
-        enemy = new Enemy(this, 100, 200, tiles, new Point(0, 200), new Point(1000, 200), 10);
-        objects.add(enemy);
+        enemies.add(new Enemy(this, 4, 5, tiles, new Point(4, 3), new Point(4, 8), "LEFT", 6));
+        enemies.add(new Enemy(this, 1, 7, tiles, new Point(1, 7), new Point(1, 12), "RIGHT", 4));
+        objects.addAll(enemies);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
         audioManager.play("src/resources/sounds/diablo.wav", true);
-        Thread thread = new Thread(this);
+        thread = new Thread(this);
         thread.start();
     }
 
@@ -51,10 +53,13 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (player.getState() == Player.State.DYING)        // Freeze movements when player is dead ie, game over
+        if (player.getState() == Player.State.DYING) {        // Freeze movements when player is dead ie, game over
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                 System.exit(0);
+            else if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                reset();
             else return;
+        }
         switch (e.getKeyCode()) {
             case KeyEvent.VK_ESCAPE -> System.exit(0);
             case KeyEvent.VK_A -> {
@@ -86,23 +91,12 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     public void keyReleased(KeyEvent e) {
         if (player.getState() == Player.State.DYING) return;
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_A -> {
+            case KeyEvent.VK_A, KeyEvent.VK_D, KeyEvent.VK_W, KeyEvent.VK_S -> {
                 player.setState(Player.State.IDLE);
-                player.setDirection(Player.Direction.LEFT);
-            }
-            case KeyEvent.VK_D -> {
-                player.setState(Player.State.IDLE);
-                player.setDirection(Player.Direction.RIGHT);
-            }
-            case KeyEvent.VK_W -> {
-                player.setState(Player.State.IDLE);
-                player.setDirection(Player.Direction.UP);
-            }
-            case KeyEvent.VK_S -> {
-                player.setState(Player.State.IDLE);
-                player.setDirection(Player.Direction.DOWN);
+                player.setDirection(Player.Direction.NONE);
             }
             case KeyEvent.VK_SPACE -> {
+                player.isSpacePressed = false;
                 player.setState(Player.State.IDLE);
             }
         }
@@ -112,9 +106,11 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     public void run() {
         while (player.getState() != Player.State.DYING) {
             try {
-                Thread.sleep(16);
+                Thread.sleep(30);
                 player.tick();
-                enemy.move();
+                for (Enemy enemy : enemies) {
+                    enemy.move();
+                }
                 draw();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -125,5 +121,22 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     public void gameOver() {
 //        audioManager.play("src/resources/sounds/gameover.wav", false);
         objects.add(new GameOver(this));
+    }
+
+    public void reset() {
+        thread.interrupt();
+        objects.clear();
+        enemies.clear();
+        background = new Background(this);
+        objects.add(background);
+        Tiles tiles = new Tiles(this);
+        objects.add(new Tiles(this));
+        player = new Player(this, 0, 0, 8, tiles, 8);
+        objects.add(player);
+        enemies.add(new Enemy(this, 4, 5, tiles, new Point(4, 3), new Point(4, 8), "LEFT", 7));
+        enemies.add(new Enemy(this, 2, 7, tiles, new Point(2, 7), new Point(2, 12), "RIGHT", 7));
+        objects.addAll(enemies);
+        Thread thread = new Thread(this);
+        thread.start();
     }
 }
