@@ -5,13 +5,11 @@ import java.util.Objects;
 public class Player implements VisibleObjects {
     private final Tiles tiles;
     private final int speed;
-    public boolean isSpacePressed = false;
     GameCanvas canvas;
     Image image;
-    Sprite runningSprite = new Sprite("player/running", 6);
-    Sprite jumpingSprite = new Sprite("player/jumping", 8);
-    Sprite idleSprite = new Sprite("player/idle", 3);
-    Sprite dyingSprite = new Sprite("player/dying", 6);
+    Sprite runningSprite = new Sprite("player/running", 5);
+    Sprite idleSprite = new Sprite("player/idle", 8);
+    Sprite dyingSprite = new Sprite("player/dying", 9);
     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
     int screenHeight = (int) size.getHeight();
     int screenWidth = (int) size.getWidth();
@@ -29,7 +27,6 @@ public class Player implements VisibleObjects {
         this.y = i * y_offset;
         this.speed = speed;
         this.tiles = tiles;
-        speed = 5;
         image = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/player/idle/00.png"))).getImage();
         playerBounds.setBounds(x, y, image.getWidth(null), image.getHeight(null));
         for (int[] tr : tiles.tiles) {
@@ -78,7 +75,7 @@ public class Player implements VisibleObjects {
         int j = (x * tiles.tiles[0].length) / screenWidth;
         int x_offset = (screenWidth / tiles.tiles[0].length);
         int y_offset = (screenHeight / tiles.tiles.length);
-        Rectangle blk = null;
+        Rectangle blk;
         System.out.println("i: " + i + " j: " + j + " x:" + rect.getX() + " y:" + rect.getY() + " xmax:" + rect.getMaxX() + " ymax:" + rect.getMaxY());
         if (i < 0 || i >= tiles.tiles.length || j < 0 || j >= tiles.tiles[0].length) {
             return false;
@@ -111,8 +108,6 @@ public class Player implements VisibleObjects {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } else if (state == State.JUMPING) {
-            image = jumpingSprite.getNextFrame();
         } else if (state == State.RUNNING) {
             image = runningSprite.getNextFrame();
         } else {
@@ -129,11 +124,7 @@ public class Player implements VisibleObjects {
     }
 
     public void tick() {
-        // Todo: implement Gravity
-//        while (state != State.JUMPING && canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
-//            y += speed;
-//            canvas.draw();
-//        }
+        // Todo: Anything random left to render
     }
 
     enum Direction {
@@ -141,6 +132,6 @@ public class Player implements VisibleObjects {
     }
 
     enum State {
-        IDLE, RUNNING, JUMPING, DYING
+        IDLE, RUNNING, DYING
     }
 }

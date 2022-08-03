@@ -13,6 +13,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     Player player;
     Enemy enemy;
     ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+    Thread thread;
 
     public GameCanvas() {
         background = new Background(this);
@@ -21,14 +22,14 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         objects.add(new Tiles(this));
         player = new Player(this, 0, 0, 8, tiles);
         objects.add(player);
-        enemies.add(new Enemy(this, 2, 3, tiles, new Point(2, 2), new Point(2, 7), "LEFT", 7));
-        enemies.add(new Enemy(this, 5, 10, tiles, new Point(5, 6), new Point(5, 19), "RIGHT", 9));
-        enemies.add(new Enemy(this, 2, 11, tiles, new Point(0, 11), new Point(5, 11), "UP", 6));
+        enemies.add(new Enemy(this, 0, 10, tiles, new Point(0, 0), new Point(0, tiles.tiles[0].length), "LEFT", 5));
+        enemies.add(new Enemy(this, 6, 10, tiles, new Point(6, 0), new Point(6, 12), "RIGHT", 7));
+        enemies.add(new Enemy(this, 2, 9, tiles, new Point(0, 9), new Point(7, 9), "UP", 5));
         objects.addAll(enemies);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
         audioManager.play("src/resources/sounds/diablo.wav", true);
-        Thread thread = new Thread(this);
+        thread = new Thread(this);
         thread.start();
     }
 
@@ -54,10 +55,13 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (player.getState() == Player.State.DYING)        // Freeze movements when player is dead ie, game over
+        if (player.getState() == Player.State.DYING) {      // Freeze movements when player is dead ie, game over
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                 System.exit(0);
+            else if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                reset();
             else return;
+        }
         switch (e.getKeyCode()) {
             case KeyEvent.VK_ESCAPE -> System.exit(0);
             case KeyEvent.VK_A -> {
@@ -75,10 +79,6 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
             case KeyEvent.VK_S -> {
                 player.setState(Player.State.RUNNING);
                 player.setDirection(Player.Direction.DOWN);
-            }
-            case KeyEvent.VK_SPACE -> {
-                player.setState(Player.State.JUMPING);
-                player.isSpacePressed = true;
             }
         }
 //        System.out.println("Key pressed: " + e.getKeyCode());
@@ -130,5 +130,23 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     public void gameOver() {
 //        audioManager.play("src/resources/sounds/gameover.wav", false);
         objects.add(new GameOver(this));
+    }
+
+    public void reset() {
+        thread.interrupt();
+        objects.clear();
+        enemies.clear();
+        background = new Background(this);
+        objects.add(background);
+        Tiles tiles = new Tiles(this);
+        objects.add(new Tiles(this));
+        player = new Player(this, 0, 0, 8, tiles);
+        objects.add(player);
+        enemies.add(new Enemy(this, 0, 10, tiles, new Point(0, 0), new Point(0, tiles.tiles[0].length), "LEFT", 5));
+        enemies.add(new Enemy(this, 6, 10, tiles, new Point(6, 0), new Point(6, 12), "RIGHT", 7));
+        enemies.add(new Enemy(this, 2, 9, tiles, new Point(0, 9), new Point(7, 9), "UP", 5));
+        objects.addAll(enemies);
+        Thread thread = new Thread(this);
+        thread.start();
     }
 }

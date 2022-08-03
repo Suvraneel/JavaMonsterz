@@ -29,17 +29,17 @@ public class Tiles implements VisibleObjects {
 
     @Override
     public void drawObject(Graphics2D g) {
-        int x_offset = canvas.getWidth() / tiles[0].length;
-        int y_offset = canvas.getHeight() / tiles.length;
-        for (int i = 0; i < tiles.length; i++) {
-            for (int j = 0; j < tiles[i].length; j++) {
-                if (tiles[i][j] == 1) {
-                    g.setColor(Color.BLACK);
-                    g.fillRect(j * x_offset, i * y_offset, x_offset, y_offset);
-                    g.setColor(Color.RED);
-                    g.drawRect(j * x_offset, i * y_offset, x_offset, y_offset);
-                }
-            }
-        }
+//        int x_offset = canvas.getWidth() / tiles[0].length;
+//        int y_offset = canvas.getHeight() / tiles.length;
+//        for (int i = 0; i < tiles.length; i++) {
+//            for (int j = 0; j < tiles[i].length; j++) {
+//                if (tiles[i][j] == 1) {
+//                    g.setColor(Color.BLACK);
+//                    g.fillRect(j * x_offset, i * y_offset, x_offset, y_offset);
+//                    g.setColor(Color.RED);
+//                    g.drawRect(j * x_offset, i * y_offset, x_offset, y_offset);
+//                }
+//            }
+//        }
     }
 }

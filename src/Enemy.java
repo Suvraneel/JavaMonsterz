@@ -3,7 +3,6 @@ import java.awt.*;
 import java.util.Objects;
 
 public class Enemy implements VisibleObjects {
-
     private final int speed;
     int x, y, x_offset, y_offset;
     GameCanvas canvas;
@@ -21,7 +20,7 @@ public class Enemy implements VisibleObjects {
     public Enemy(GameCanvas canvas, int i, int j, Tiles tiles, Point rangeMin, Point rangeMax, String dir, int speed) {
         this.canvas = canvas;
         this.speed = speed;
-        enemy = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/enemy/pink/running/00.png"))).getImage();
+        enemy = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/enemy/cop/running/00.png"))).getImage();
         this.tiles = tiles;
         this.direction = Direction.valueOf(dir);
         x_offset = (screenWidth / tiles.tiles[0].length);
