@@ -16,15 +16,17 @@ public class Player implements VisibleObjects {
     int screenHeight = (int) size.getHeight();
     int screenWidth = (int) size.getWidth();
     Rectangle playerBounds = new Rectangle();
+    int x_offset, y_offset;
     private State state = State.IDLE;
     private Direction direction = Direction.RIGHT;
-    private int x;
-    private int y;
+    private int x, y;
 
-    public Player(GameCanvas canvas, int x, int y, int speed, Tiles tiles) {
+    public Player(GameCanvas canvas, int i, int j, int speed, Tiles tiles) {
         this.canvas = canvas;
-        this.x = x;
-        this.y = y;
+        x_offset = (screenWidth / tiles.tiles[0].length);
+        y_offset = (screenHeight / tiles.tiles.length);
+        this.x = j * x_offset;
+        this.y = i * y_offset;
         this.speed = speed;
         this.tiles = tiles;
         speed = 5;
@@ -78,7 +80,7 @@ public class Player implements VisibleObjects {
         int y_offset = (screenHeight / tiles.tiles.length);
         Rectangle blk = null;
         System.out.println("i: " + i + " j: " + j + " x:" + rect.getX() + " y:" + rect.getY() + " xmax:" + rect.getMaxX() + " ymax:" + rect.getMaxY());
-        if (i <= 0 || i >= tiles.tiles.length || j <= 0 || j >= tiles.tiles[0].length) {
+        if (i < 0 || i >= tiles.tiles.length || j < 0 || j >= tiles.tiles[0].length) {
             return false;
         }
         if (tiles.tiles[i][j] == 1) {
@@ -128,10 +130,10 @@ public class Player implements VisibleObjects {
 
     public void tick() {
         // Todo: implement Gravity
-        while (state != State.JUMPING && canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
-            y += speed;
-            canvas.draw();
-        }
+//        while (state != State.JUMPING && canMove(x, y + image.getHeight(canvas) + speed)) {     // x, y+imgHt+speed
+//            y += speed;
+//            canvas.draw();
+//        }
     }
 
     enum Direction {

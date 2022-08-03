@@ -12,16 +12,19 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     Tiles tiles;
     Player player;
     Enemy enemy;
+    ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 
     public GameCanvas() {
         background = new Background(this);
         objects.add(background);
         Tiles tiles = new Tiles(this);
         objects.add(new Tiles(this));
-        player = new Player(this, 0, 0, 5, tiles);
+        player = new Player(this, 0, 0, 8, tiles);
         objects.add(player);
-        enemy = new Enemy(this, 100, 200, tiles, new Point(0, 200), new Point(1000, 200), 10);
-        objects.add(enemy);
+        enemies.add(new Enemy(this, 2, 3, tiles, new Point(2, 2), new Point(2, 7), "LEFT", 7));
+        enemies.add(new Enemy(this, 5, 10, tiles, new Point(5, 6), new Point(5, 19), "RIGHT", 9));
+        enemies.add(new Enemy(this, 2, 11, tiles, new Point(0, 11), new Point(5, 11), "UP", 6));
+        objects.addAll(enemies);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
         audioManager.play("src/resources/sounds/diablo.wav", true);
@@ -114,7 +117,9 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
             try {
                 Thread.sleep(16);
                 player.tick();
-                enemy.move();
+                for (Enemy enemy : enemies) {
+                    enemy.move();
+                }
                 draw();
             } catch (Exception e) {
                 e.printStackTrace();

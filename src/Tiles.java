@@ -11,7 +11,7 @@ public class Tiles implements VisibleObjects {
     public Tiles(GameCanvas canvas) {
         this.canvas = canvas;
         try {
-            Scanner scanner = new Scanner(new File(Objects.requireNonNull(getClass().getResource("resources/maps/map_1.csv")).getFile()));
+            Scanner scanner = new Scanner(new File(Objects.requireNonNull(getClass().getResource("resources/maps/map.csv")).getFile()));
             String[] tokens = scanner.nextLine().split(",");
             int rows = Integer.parseInt(tokens[0]);
             int columns = Integer.parseInt(tokens[1]);

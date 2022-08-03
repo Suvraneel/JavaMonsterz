@@ -5,30 +5,37 @@ import java.util.Objects;
 public class Enemy implements VisibleObjects {
 
     private final int speed;
-    int x, y;
+    int x, y, x_offset, y_offset;
     GameCanvas canvas;
     Image enemy;
-    Sprite runningSprite = new Sprite("enemy/pink/running", 6);
+    Sprite runningSprite = new Sprite("enemy/cop/running", 8);
+    Sprite attackingSprite = new Sprite("enemy/cop/attacking", 10);
     Rectangle enemyBounds = new Rectangle();
     Point rangeMin, rangeMax;
-    Direction direction = Direction.LEFT;
+    Direction direction;
     Tiles tiles;
+    Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+    int screenHeight = (int) size.getHeight();
+    int screenWidth = (int) size.getWidth();
 
-    public Enemy(GameCanvas canvas, int x, int y, Tiles tiles, Point rangeMin, Point rangeMax, int speed) {
+    public Enemy(GameCanvas canvas, int i, int j, Tiles tiles, Point rangeMin, Point rangeMax, String dir, int speed) {
         this.canvas = canvas;
         this.speed = speed;
         enemy = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/enemy/pink/running/00.png"))).getImage();
-        this.x = x;
-        this.y = y;
-        this.rangeMin = rangeMin;
-        this.rangeMax = rangeMax;
         this.tiles = tiles;
+        this.direction = Direction.valueOf(dir);
+        x_offset = (screenWidth / tiles.tiles[0].length);
+        y_offset = (screenHeight / tiles.tiles.length);
+        this.x = j * x_offset;
+        this.y = i * y_offset;
+        this.rangeMin = new Point(rangeMin.y * x_offset, rangeMin.x * y_offset);
+        this.rangeMax = new Point(rangeMax.y * x_offset, rangeMax.x * y_offset);
         enemyBounds.setBounds(x, y, enemy.getWidth(null), enemy.getHeight(null));
     }
 
     @Override
     public void drawObject(Graphics2D g) {
-        enemy = runningSprite.getNextFrame();
+        enemy = (canvas.player.getState() != Player.State.DYING) ? runningSprite.getNextFrame() : attackingSprite.getNextFrame();
         if (direction == Direction.RIGHT) {
             g.drawImage(enemy, x, y, canvas);
         } else {
