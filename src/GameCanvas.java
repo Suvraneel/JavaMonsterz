@@ -31,7 +31,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         objects.addAll(cameras);
         addKeyListener(this);
 //        setBackground(Color.BLACK);
-        audioManager.play("src/resources/sounds/diablo.wav", true);
+        audioManager.play("src/resources/sounds/sneaky.wav", true);
         thread = new Thread(this);
         thread.start();
     }
@@ -153,6 +153,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         enemies.add(new Enemy(this, 2, 9, tiles, new Point(0, 9), new Point(7, 9), "UP", 5));
         objects.addAll(enemies);
         cameras.add(new Camera(this, 3, 2, tiles, 20));
+        cameras.add(new Camera(this, 8, 2, tiles, 20));
         objects.addAll(cameras);
         Thread thread = new Thread(this);
         thread.start();

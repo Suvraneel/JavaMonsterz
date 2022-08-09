@@ -18,7 +18,7 @@ public class Player implements VisibleObjects {
     private State state = State.IDLE;
     private Direction direction = Direction.RIGHT;
     private int x, y;
-
+    AudioManager audioManager = new AudioManager();
     public Player(GameCanvas canvas, int i, int j, int speed, Tiles tiles) {
         this.canvas = canvas;
         x_offset = (screenWidth / tiles.tiles[0].length);
@@ -96,6 +96,7 @@ public class Player implements VisibleObjects {
         this.state = state;
         if (state == State.DYING) {
             try {
+                audioManager.play("src/resources/sounds/die.wav", false);
                 while (true) {
                     image = dyingSprite.getNextFrame();
                     Thread.sleep(10);

@@ -15,7 +15,7 @@ public class Camera implements VisibleObjects {
     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
     int screenHeight = (int) size.getHeight();
     int screenWidth = (int) size.getWidth();
-
+    AudioManager audioManager = new AudioManager();
     public Camera(GameCanvas canvas, int i, int j, Tiles tiles, int delay) {
         this.canvas = canvas;
         this.delay = delay;
@@ -43,6 +43,7 @@ public class Camera implements VisibleObjects {
         }
         if (camBounds.intersects(canvas.player.playerBounds)) {
             camera = alarm;
+            audioManager.play("src/resources/sounds/siren.wav", false);
             canvas.player.setState(Player.State.DYING);
         }
     }
