@@ -97,15 +97,11 @@ public class Player implements VisibleObjects {
         if (state == State.DYING) {
             try {
                 audioManager.play("src/resources/sounds/die.wav", false);
-                while (true) {
+                while (dyingSprite.spriteIndex < dyingSprite.frames.length - 1) {
                     image = dyingSprite.getNextFrame();
                     Thread.sleep(10);
-                    if (dyingSprite.spriteIndex == dyingSprite.frames.length - 1) {
-                        canvas.gameOver();
-                        break;
-                    }
                 }
-                canvas.gameOver();
+                canvas.screen = GameCanvas.Screen.GAMEOVER;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

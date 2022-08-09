@@ -6,9 +6,10 @@ public class Background implements VisibleObjects {
     GameCanvas canvas;
     Image background;
 
-    public Background(GameCanvas canvas) {
+    public Background(GameCanvas canvas, String bg) {
         this.canvas = canvas;
-        background = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/images/dungeon.png"))).getImage();
+        String path = "resources/images/" + bg + ".png";
+        background = new ImageIcon(Objects.requireNonNull(getClass().getResource(path))).getImage();
     }
 
     @Override

@@ -49,6 +49,6 @@ public class Camera implements VisibleObjects {
     }
 
     enum State {
-        ON, OFF
+        ON, OFF, ALARM
     }
 }
