@@ -1,15 +1,15 @@
 import java.awt.*;
 
-public class GameOver implements VisibleObjects {
-    String msg = "Game Over";
-    String msg2 = "Better Luck Next Time !";
-    String msg3 = "Press Enter to Retry / Escape to Exit to Menu";
+public class GameWon implements VisibleObjects {
+    String msg = "Game Won !";
+    String msg2 = "Congrats, you made it!";
+    String msg3 = "Press Enter to Restart / Escape to Exit to Menu";
     Font huge = new Font("Helvetica", Font.BOLD, 200);
     Font small = new Font("Helvetica", Font.BOLD, 120);
     Font tiny = new Font("Helvetica", Font.BOLD, 50);
     GameCanvas canvas;
 
-    public GameOver(GameCanvas canvas) {
+    public GameWon(GameCanvas canvas) {
         this.canvas = canvas;
     }
 

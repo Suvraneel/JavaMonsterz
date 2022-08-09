@@ -77,6 +77,7 @@ public class Enemy implements VisibleObjects {
             direction = Direction.UP;
         else if (enemyBounds.intersects(canvas.player.playerBounds)) {
             canvas.player.setState(Player.State.DYING);
+            canvas.screen = GameCanvas.Screen.GAMEOVER;
         } else return true;
         return false;
     }

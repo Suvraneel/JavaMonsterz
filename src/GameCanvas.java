@@ -55,9 +55,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
                     case KeyEvent.VK_ESCAPE -> System.exit(0);
                 }
             }
-            case GAMEOVER -> {
-                objects.add(new GameOver(this));
-                draw();
+            case GAMEOVER, GAMEWON -> {
                 // Freeze movements when player is dead ie, game over
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
                     exitToMenu();
@@ -118,7 +116,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
 
     @Override
     public void run() {
-        while (player.getState() != Player.State.DYING) {
+        while (screen == Screen.GAME) {
             try {
                 Thread.sleep(16);
                 player.tick();
@@ -136,18 +134,32 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
                 e.printStackTrace();
             }
         }
+        if (screen == Screen.GAMEOVER) {
+            System.out.println("Game over");
+            objects.add(new GameOver(this));
+        } else if (screen == Screen.GAMEWON) {
+            System.out.println("Game won");
+            objects.add(new GameWon(this));
+        }
+        draw();
+        if(thread!=null)
+            thread.interrupt();
     }
 
     public void reset() {
+        screen = Screen.GAME;
         if(thread!=null)
             thread.interrupt();
         enemies.clear();
         cameras.clear();
         missionObjectives.clear();
+        objects.clear();
         background = new Background(this, "Dungeon" );
         objects.add(background);
         Tiles tiles = new Tiles(this);
         objects.add(new Tiles(this));
+        missionObjectives.add(new MissionObjectives(this, 4, 13, tiles));
+        objects.addAll(missionObjectives);
         player = new Player(this, 0, 0, 8, tiles);
         objects.add(player);
         enemies.add(new Enemy(this, 0, 10, tiles, new Point(0, 0), new Point(0, tiles.tiles[0].length), "LEFT", 5));
@@ -157,8 +169,6 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         cameras.add(new Camera(this, 3, 2, tiles, 20));
         cameras.add(new Camera(this, 8, 2, tiles, 20));
         objects.addAll(cameras);
-        missionObjectives.add(new MissionObjectives(this, 4, 13, tiles));
-        objects.addAll(missionObjectives);
         Thread thread = new Thread(this);
         thread.start();
     }
@@ -177,6 +187,6 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     }
 
     enum Screen {
-        MENU, GAME, GAMEOVER
+        MENU, GAME, GAMEOVER, GAMEWON
     }
 }

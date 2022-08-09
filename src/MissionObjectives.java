@@ -32,18 +32,17 @@ public class MissionObjectives implements VisibleObjects {
     }
 
     public void tick() {
-        if (missionBounds.intersects(canvas.player.playerBounds)) {
+        if (missionBounds.intersects(canvas.player.playerBounds) && canvas.screen == GameCanvas.Screen.GAME) {
             try {
-                audioManager.play("src/resources/sounds/die.wav", false);
+                audioManager.play("src/resources/sounds/treasure.wav", false);
                 while (missionSprite.spriteIndex < missionSprite.frames.length - 1) {
                     missionImg = missionSprite.getNextFrame();
                     Thread.sleep(10);
                 }
-                canvas.screen = GameCanvas.Screen.GAMEOVER;
+                canvas.screen = GameCanvas.Screen.GAMEWON;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            audioManager.play("src/resources/sounds/siren.wav", false);
         }
     }
 }
