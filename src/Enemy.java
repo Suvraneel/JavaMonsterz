@@ -64,7 +64,6 @@ public class Enemy implements VisibleObjects {
         System.out.println("enemy x: " + x);
         enemyBounds.setBounds(x, y, enemy.getWidth(null), enemy.getHeight(null));
         System.out.println(enemyBounds);
-        canvas.draw();
     }
 
     private boolean canMove(int x, int y) {
