@@ -7,9 +7,9 @@ public class Player implements VisibleObjects {
     private final int speed;
     GameCanvas canvas;
     Image image;
-    Sprite runningSprite = new Sprite("player/running", 5);
-    Sprite idleSprite = new Sprite("player/idle", 8);
-    Sprite dyingSprite = new Sprite("player/dying", 9);
+    Sprite runningSprite;
+    Sprite idleSprite;
+    Sprite dyingSprite;
     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
     int screenHeight = (int) size.getHeight();
     int screenWidth = (int) size.getWidth();
@@ -19,7 +19,7 @@ public class Player implements VisibleObjects {
     private Direction direction = Direction.RIGHT;
     private int x, y;
     AudioManager audioManager = new AudioManager();
-    public Player(GameCanvas canvas, int i, int j, int speed, Tiles tiles) {
+    public Player(GameCanvas canvas, int i, int j, int speed, Tiles tiles, int selectedCharacter) {
         this.canvas = canvas;
         x_offset = (screenWidth / tiles.tiles[0].length);
         y_offset = (screenHeight / tiles.tiles.length);
@@ -27,7 +27,11 @@ public class Player implements VisibleObjects {
         this.y = i * y_offset;
         this.speed = speed;
         this.tiles = tiles;
-        image = new ImageIcon(Objects.requireNonNull(getClass().getResource("resources/sprites/player/idle/00.png"))).getImage();
+        String path = "resources/sprites/player" + selectedCharacter + "/idle/00.png";
+        image = new ImageIcon(Objects.requireNonNull(getClass().getResource(path))).getImage();
+        idleSprite = new Sprite("player" + selectedCharacter + "/idle", 8);
+        runningSprite = new Sprite("player" + selectedCharacter + "/running", 8);
+        dyingSprite = new Sprite("player" + selectedCharacter + "/dying", 9);
         playerBounds.setBounds(x, y, image.getWidth(null), image.getHeight(null));
         for (int[] tr : tiles.tiles) {
             for (int t : tr)
@@ -122,6 +126,7 @@ public class Player implements VisibleObjects {
 
     public void tick() {
         // Todo: Anything random left to render
+        setState(state);
     }
 
     enum Direction {

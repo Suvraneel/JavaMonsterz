@@ -17,6 +17,8 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
     Thread thread;
     Screen screen = Screen.MENU;
     Menu menu;
+    CharacterSelection characterSelection;
+    public int SelectedCharacter = 0;
     public GameCanvas() {
         addKeyListener(this);
         setBackground(Color.BLACK);
@@ -55,6 +57,14 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
                     case KeyEvent.VK_ESCAPE -> System.exit(0);
                 }
             }
+            case CHARSELECT -> {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_LEFT -> characterSelection.moveLt();
+                    case KeyEvent.VK_RIGHT -> characterSelection.moveRt();
+                    case KeyEvent.VK_ENTER -> characterSelection.select();
+                    case KeyEvent.VK_ESCAPE -> exitToMenu();
+                }
+            }
             case GAMEOVER, GAMEWON -> {
                 // Freeze movements when player is dead ie, game over
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
@@ -82,7 +92,6 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
                     }
                     case KeyEvent.VK_ESCAPE -> exitToMenu();
                 }
-//        System.out.println("Key pressed: " + e.getKeyCode());
                 player.move(player.getDirection());
             }
         }
@@ -140,6 +149,8 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         } else if (screen == Screen.GAMEWON) {
             System.out.println("Game won");
             objects.add(new GameWon(this));
+        } else if (screen == Screen.CHARSELECT) {
+            objects.add(new CharacterSelection(this));
         }
         draw();
         if(thread!=null)
@@ -160,7 +171,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         objects.add(new Tiles(this));
         missionObjectives.add(new MissionObjectives(this, 4, 13, tiles));
         objects.addAll(missionObjectives);
-        player = new Player(this, 0, 0, 8, tiles);
+        player = new Player(this, 0, 0, 8, tiles, (SelectedCharacter+1));
         objects.add(player);
         enemies.add(new Enemy(this, 0, 10, tiles, new Point(0, 0), new Point(0, tiles.tiles[0].length), "LEFT", 5));
         enemies.add(new Enemy(this, 6, 10, tiles, new Point(6, 0), new Point(6, 12), "RIGHT", 7));
@@ -168,6 +179,7 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         objects.addAll(enemies);
         cameras.add(new Camera(this, 3, 2, tiles, 20));
         cameras.add(new Camera(this, 8, 2, tiles, 20));
+        cameras.add(new Camera(this, 0, 12, tiles, 20));
         objects.addAll(cameras);
         Thread thread = new Thread(this);
         thread.start();
@@ -186,7 +198,20 @@ public class GameCanvas extends Canvas implements KeyListener, Runnable {
         objects.add(menu);
     }
 
+    public void charSelMenu() {
+        if(thread!=null)
+            thread.interrupt();
+        objects.clear();
+        enemies.clear();
+        cameras.clear();
+        missionObjectives.clear();
+        screen = Screen.CHARSELECT;
+        objects.add(new Background(this, "Jailbreak"));
+        characterSelection = new CharacterSelection(this);
+        objects.add(characterSelection);
+    }
+
     enum Screen {
-        MENU, GAME, GAMEOVER, GAMEWON
+        MENU, GAME, GAMEOVER, GAMEWON, CHARSELECT
     }
 }

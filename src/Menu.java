@@ -11,7 +11,7 @@ public class Menu implements VisibleObjects {
     public Menu(GameCanvas canvas) {
         this.canvas = canvas;
         options.add("New Game");
-        options.add("Load Game");
+        options.add("Character Selection");
         options.add("Exit");
     }
 
@@ -42,17 +42,13 @@ public class Menu implements VisibleObjects {
         selected = (selected + 1) % options.size();
     }
 
-    public int getSelected() {
-        return selected;
-    }
-
     public void select() {
         if (selected == 0) {
             canvas.screen = GameCanvas.Screen.GAME;
             canvas.reset();
         } else if (selected == 1) {
-            canvas.screen = GameCanvas.Screen.GAME;
-            canvas.reset();
+            canvas.screen = GameCanvas.Screen.CHARSELECT;
+            canvas.charSelMenu();
         } else if (selected == 2) {
             System.exit(0);
         }

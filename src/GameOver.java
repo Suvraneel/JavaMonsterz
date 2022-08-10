@@ -21,7 +21,7 @@ public class GameOver implements VisibleObjects {
         g.setColor(Color.white);
         g.setFont(small);
         g.drawString(msg2, (canvas.getWidth() - g.getFontMetrics().stringWidth(msg2)) / 2, (canvas.getHeight() - g.getFontMetrics().getHeight()) / 2 + g.getFontMetrics().getHeight());
-        g.setColor(Color.blue);
+        g.setColor(Color.cyan);
         g.setFont(tiny);
         g.drawString(msg3, (canvas.getWidth() - g.getFontMetrics().stringWidth(msg3)) / 2, (canvas.getHeight() - g.getFontMetrics().getHeight()) / 2 + g.getFontMetrics().getHeight() * 5);
     }
