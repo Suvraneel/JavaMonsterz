@@ -6,7 +6,7 @@ public class GameWindow extends JFrame implements ActionListener {
     GameCanvas canvas = new GameCanvas();
 
     public GameWindow() {
-        setTitle("JavaMonsterzzz");
+        setTitle("JavaJailbreak");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
